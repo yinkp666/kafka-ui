@@ -16,7 +16,11 @@ import {
 
 import * as S from './List.styled';
 
-const ACList: React.FC = () => {
+interface ACListProps {
+  searchTerm: string;
+}
+
+const ACList: React.FC<ACListProps> = ({ searchTerm }) => {
   const { clusterName } = useAppParams<{ clusterName: ClusterName }>();
   const theme = useTheme();
   const { data: aclList } = useAcls(clusterName);
@@ -33,6 +37,11 @@ const ACList: React.FC = () => {
     }
   };
 
+  const filteredAclList = aclList?.filter((acl) =>
+    acl.principal.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    acl.resourceName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const columns = React.useMemo<ColumnDef<KafkaAcl>[]>(
     () => [
       {
@@ -43,7 +52,6 @@ const ACList: React.FC = () => {
       {
         header: 'Resource',
         accessorKey: 'resourceType',
-        // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ getValue }) => (
           <S.EnumCell>{getValue<string>().toLowerCase()}</S.EnumCell>
         ),
@@ -52,7 +60,6 @@ const ACList: React.FC = () => {
       {
         header: 'Pattern',
         accessorKey: 'resourceName',
-        // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ getValue, row }) => {
           let chipType;
           if (
@@ -87,7 +94,6 @@ const ACList: React.FC = () => {
       {
         header: 'Operation',
         accessorKey: 'operation',
-        // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ getValue }) => (
           <S.EnumCell>{getValue<string>().toLowerCase()}</S.EnumCell>
         ),
@@ -96,7 +102,6 @@ const ACList: React.FC = () => {
       {
         header: 'Permission',
         accessorKey: 'permission',
-        // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ getValue }) => (
           <S.Chip
             chipType={
@@ -112,7 +117,6 @@ const ACList: React.FC = () => {
       },
       {
         id: 'delete',
-        // eslint-disable-next-line react/no-unstable-nested-components
         cell: ({ row }) => {
           return (
             <S.DeleteCell onClick={() => onDeleteClick(row.original)}>
@@ -141,7 +145,7 @@ const ACList: React.FC = () => {
       <PageHeading text="Access Control List" />
       <Table
         columns={columns}
-        data={aclList ?? []}
+        data={filteredAclList ?? []}
         emptyMessage="No ACL items found"
         onRowHover={onRowHover}
         onMouseLeave={() => setRowId('')}

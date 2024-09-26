@@ -63,7 +63,7 @@ const TopicTable: React.FC = () => {
       {
         header: 'Replication Factor',
         accessorKey: 'replicationFactor',
-        enableSorting: false,
+        enableSorting: true, // Enable sorting for Replication Factor
       },
       {
         header: 'Number of messages',
